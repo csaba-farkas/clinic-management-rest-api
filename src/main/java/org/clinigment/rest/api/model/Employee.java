@@ -240,6 +240,13 @@ public class Employee implements Serializable {
     public void setUpdatedAt(Timestamp updatedAt) {
         this.updatedAt = updatedAt;
     }
+
+    @Override
+    public String toString() {
+        return "Employee{" + "employeeId=" + employeeId + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", ppsNumber=" + ppsNumber + ", employedSince=" + employedSince + ", employedUntil=" + employedUntil + ", role=" + role + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", email=" + email + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+    }
+    
+    
     
     
     

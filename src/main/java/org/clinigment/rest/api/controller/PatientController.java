@@ -23,12 +23,14 @@ import org.clinigment.rest.api.model.PatientAddress;
  */
 public class PatientController implements Serializable {
 
+    private UserTransaction utx = null;
+    private EntityManagerFactory emf = null;
+    
     public PatientController(UserTransaction utx, EntityManagerFactory emf) {
         this.utx = utx;
         this.emf = emf;
     }
-    private UserTransaction utx = null;
-    private EntityManagerFactory emf = null;
+    
 
     public EntityManager getEntityManager() {
         return emf.createEntityManager();

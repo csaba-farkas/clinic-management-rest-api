@@ -10,6 +10,10 @@
             <param-value>org.clinigment.rest.api</param-value>
             
         </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.your.package;org.codehaus.jackson.jaxrs</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
