@@ -15,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.clinigment.rest.api.model.adapters.LocalDateAdapter;
@@ -31,12 +32,11 @@ import org.clinigment.rest.api.model.enums.EmpRole;
 @XmlRootElement
 public class Employee implements Serializable {
     
-    private static final long serialVersionUID = 1L;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EMPLOYEE_ID", updatable = false, nullable = false)
-    private Long employeeId;
+    private Long id;
     
     @Column(name = "TITLE", length = 5)
     private String title;
@@ -95,11 +95,11 @@ public class Employee implements Serializable {
     }
     
     public Employee(Long id) {
-        this.employeeId = id;
+        this.id = id;
     }
 
     public Employee(Long employeeId, String title, String firstName, String lastName, String middleName, LocalDate dateOfBirth, String ppsNumber, LocalDate employedSince, LocalDate employedUntil, EmpRole role, String mobilePhone, String homePhone, String email, EmployeeAddress employeeAddress, Timestamp createdAt, Timestamp updatedAt) {
-        this.employeeId = employeeId;
+        this.id = employeeId;
         this.title = title;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -117,8 +117,9 @@ public class Employee implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    public Long getEmployeeId() {
-        return employeeId;
+    @XmlID
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {
@@ -243,7 +244,7 @@ public class Employee implements Serializable {
 
     @Override
     public String toString() {
-        return "Employee{" + "employeeId=" + employeeId + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", ppsNumber=" + ppsNumber + ", employedSince=" + employedSince + ", employedUntil=" + employedUntil + ", role=" + role + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", email=" + email + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+        return "Employee{" + "employeeId=" + id + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", ppsNumber=" + ppsNumber + ", employedSince=" + employedSince + ", employedUntil=" + employedUntil + ", role=" + role + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", email=" + email + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
     
     

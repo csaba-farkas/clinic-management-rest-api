@@ -176,8 +176,6 @@ public class PatientController implements Serializable {
     public Patient findPatient(Long id) {
         EntityManager em = getEntityManager();
         try {
-            System.out.println("Working harder...");
-            System.out.println("log patient " + em.find(Patient.class, id).toString());
             return em.find(Patient.class, id);
         } finally {
             em.close();

@@ -61,6 +61,7 @@ public class PatientAddress implements Serializable {
         //Empty constructor for JPA
     }
 
+    @XmlTransient
     public Long getPatientId() {
         return patientId;
     }

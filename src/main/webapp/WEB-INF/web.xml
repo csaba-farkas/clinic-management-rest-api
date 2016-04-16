@@ -8,7 +8,6 @@
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>org.clinigment.rest.api</param-value>
-            
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>

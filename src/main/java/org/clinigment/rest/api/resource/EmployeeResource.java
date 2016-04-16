@@ -55,7 +55,7 @@ public class EmployeeResource {
             Date now = Calendar.getInstance().getTime();
             employee.setCreatedAt(new Timestamp(now.getTime()));
             getController().create(employee);
-            return Response.created(URI.create(employee.getEmployeeId().toString())).build();
+            return Response.created(URI.create(employee.getId().toString())).build();
         } catch (Exception ex) {
             return Response.notModified("Employee with PPS number entered, already exists.").build();
         }
@@ -88,6 +88,7 @@ public class EmployeeResource {
     @GET
     @Path("{id}")
     public Employee find(@PathParam("id") Long id) {
+        System.out.println("Log employee get by id: " + getController().findEmployee(id));
         return getController().findEmployee(id);
     }
 

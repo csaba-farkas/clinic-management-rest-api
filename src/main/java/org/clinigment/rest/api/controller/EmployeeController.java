@@ -45,16 +45,18 @@ public class EmployeeController implements Serializable {
             if(employee.getEmployeeAddress() != null) {
                 tempAddress = employee.getEmployeeAddress();
                 
-                //employee.setEmployeeAddress(null);
+                employee.setEmployeeAddress(null);
             }
             
             em.persist(employee);
             
             em.flush();
+            Long empId = employee.getId();
+            System.out.println("Log in create: " + empId);
             
-            //Modify address with patient (now with id)
-            //tempAddress.setEmployee(employee);
-            //employee.setEmployeeAddress(tempAddress);
+            //Modify address with employee (now with id)
+            tempAddress.setEmployee(employee);
+            employee.setEmployeeAddress(tempAddress);
                        
             //Update patient with changes
             em.merge(employee);
@@ -90,7 +92,7 @@ public class EmployeeController implements Serializable {
             }
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Long id = employee.getEmployeeId();
+                Long id = employee.getId();
                 if (findEmployee(id) == null) {
                     throw new NonexistentEntityException("The employee with id " + id + " no longer exists.");
                 }
@@ -111,7 +113,7 @@ public class EmployeeController implements Serializable {
             Employee employee;
             try {
                 employee = em.getReference(Employee.class, id);
-                employee.getEmployeeId();
+                employee.getId();
             } catch (EntityNotFoundException enfe) {
                 throw new NonexistentEntityException("The employee with id " + id + " no longer exists.", enfe);
             }

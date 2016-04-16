@@ -47,7 +47,7 @@ public class EmployeeAddress implements Serializable {
     private String country;
 
     public EmployeeAddress(Employee employee, String addressLine1, String addressLine2, String addressLine3, String cityTown, String county, String country) {
-        this.empId = employee.getEmployeeId();
+        this.empId = employee.getId();
         this.employee = employee;
         this.addressLine1 = addressLine1;
         this.addressLine2 = addressLine2;
@@ -75,6 +75,8 @@ public class EmployeeAddress implements Serializable {
     }
 
     public void setEmployee(Employee employee) {
+        System.out.println("Log in setEmployee: " + employee);
+        this.empId = employee.getId();
         this.employee = employee;
     }
 
@@ -124,6 +126,11 @@ public class EmployeeAddress implements Serializable {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    @Override
+    public String toString() {
+        return "EmployeeAddress{" + "empId=" + empId + ", employee=" + employee + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2 + ", addressLine3=" + addressLine3 + ", cityTown=" + cityTown + ", county=" + county + ", country=" + country + '}';
     }
 
     
