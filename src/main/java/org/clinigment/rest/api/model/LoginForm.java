@@ -2,6 +2,8 @@
 package org.clinigment.rest.api.model;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -9,8 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author csaba
  */
-@Entity
-@Table(name="system_user")
+//@Entity
+//@Table(name="system_user")
 @XmlRootElement
 public class LoginForm {
     
@@ -20,6 +22,10 @@ public class LoginForm {
     public LoginForm(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+    
+    public LoginForm() {
+        
     }
 
     public String getUsername() {

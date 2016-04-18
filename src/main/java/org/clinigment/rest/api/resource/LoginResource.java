@@ -1,6 +1,8 @@
 
 package org.clinigment.rest.api.resource;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
@@ -11,9 +13,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.clinigment.rest.api.controller.EmployeeController;
+import javax.ws.rs.core.Response.Status;
 import org.clinigment.rest.api.controller.LoginController;
+import org.clinigment.rest.api.controller.exceptions.LoginException;
 import org.clinigment.rest.api.model.LoginForm;
+import org.clinigment.rest.api.model.UnauthorizedEntity;
 
 /**
  *
@@ -38,8 +42,19 @@ public class LoginResource {
         }
     }
     
+    public LoginResource() {
+        
+    }
+    
     @POST
     public Response login(LoginForm loginForm) {
+        try {
+            getController().login(loginForm);
+        } catch (LoginException ex) {
+            return Response.status(Status.UNAUTHORIZED)
+                    .entity(new UnauthorizedEntity(ex.getMessage()))
+                    .build();
+        }
         return Response.ok().build();
     }
 }

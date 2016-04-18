@@ -2,10 +2,8 @@
 package org.clinigment.rest.api.model;
 
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.XmlValue;
 
 /**
  *
@@ -22,6 +20,11 @@ public class UnauthorizedEntity {
     
     public UnauthorizedEntity() {
         this.message = "Unauthorized";
+        this.errorCode = 401;
+    }
+    
+    public UnauthorizedEntity(String message) {
+        this.message = message;
         this.errorCode = 401;
     }
 
