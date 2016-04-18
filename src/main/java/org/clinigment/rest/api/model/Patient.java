@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -34,6 +35,8 @@ import org.clinigment.rest.api.model.enums.Gender;
 @XmlRootElement
 public class Patient implements Serializable {
 
+    
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "PATIENT_ID", updatable = false, nullable = false)
@@ -275,6 +278,44 @@ public class Patient implements Serializable {
         this.allergyCollection = allergyCollection;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 61 * hash + Objects.hashCode(this.ppsNumber);
+        return hash;
+    }
+
+    /**
+     * When comparing the equality of two Patient objects, their PPS number
+     * property is the base of the comparison. Apart from the id (which doesn't exist
+     * before they are written into the database), only the PPS number is unique for
+     * every patient.
+     * 
+     * @param obj Object to compare to
+     * @return true if two objects are equal, false if not
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Patient other = (Patient) obj;
+        if (!Objects.equals(this.ppsNumber, other.ppsNumber)) {
+            return false;
+        }
+        return true;
+    }
+
+    
+
+    
+    
     @Override
     public String toString() {
         return "Patient{" + "id=" + id + ", title=" + title + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", ppsNumber=" + ppsNumber + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", email=" + email + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", address=" + patientAddress + ", nextOfKinName=" + nextOfKinName + ", nextOfKinContact=" + nextOfKinContact + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", allergyCollection=" + allergyCollection + '}';

@@ -18,43 +18,47 @@ import org.glassfish.jersey.internal.util.Base64;
 @Provider
 public class SecurityFilter implements ContainerRequestFilter {
     
-    //Static final Strings for header auth values
+    //Static final Strings for header auth values, and login url
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_HEADER_PREFIX = "Basic ";
+    private static final String LOGIN_URL_PREFIX =  "login";
     
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         
-        //Get the encoded auth string from header
-        List<String> authHeader = requestContext.getHeaders().get(AUTHORIZATION_HEADER);
-        
-        if(authHeader != null && authHeader.size() > 0) {
-            String authToken = authHeader.get(0);
-            //Replace "Basic " with ""
-            authToken = authToken.replaceFirst(AUTHORIZATION_HEADER_PREFIX, "");
-            //Decod username + password
-            String decodedString = Base64.decodeAsString(authToken);
-            
-            //Tokenize username and password out of the string
-            StringTokenizer tokenizer = new StringTokenizer(decodedString, ":");
-            
-            String username = tokenizer.nextToken();
-            String password = tokenizer.nextToken();
-            
-            if(username.equals("admin") && password.equals("admin")) {
-                return;
+        //Apart from login resource, all other resources will require basic authentication
+        if(!requestContext.getUriInfo().getPath().contains(LOGIN_URL_PREFIX)) {
+            //Get the encoded auth string from header
+            List<String> authHeader = requestContext.getHeaders().get(AUTHORIZATION_HEADER);
+
+            if(authHeader != null && authHeader.size() > 0) {
+                String authToken = authHeader.get(0);
+                //Replace "Basic " with ""
+                authToken = authToken.replaceFirst(AUTHORIZATION_HEADER_PREFIX, "");
+                //Decod username + password
+                String decodedString = Base64.decodeAsString(authToken);
+
+                //Tokenize username and password out of the string
+                StringTokenizer tokenizer = new StringTokenizer(decodedString, ":");
+
+                String username = tokenizer.nextToken();
+                String password = tokenizer.nextToken();
+
+                if(username.equals("admin") && password.equals("admin")) {
+                    return;
+                }
             }
+
+            UnauthorizedEntity unauthorizedEntity = new UnauthorizedEntity();
+
+            //Create unauthorized response
+            Response unauthorizedStatus = Response
+                                            .status(Response.Status.UNAUTHORIZED)
+                                            .entity(unauthorizedEntity)
+                                            .build();
+            //Break the request with "abortWith" method
+            requestContext.abortWith(unauthorizedStatus);
         }
-        
-        UnauthorizedEntity unauthorizedEntity = new UnauthorizedEntity();
-        
-        //Create unauthorized response
-        Response unauthorizedStatus = Response
-                                        .status(Response.Status.UNAUTHORIZED)
-                                        .entity(unauthorizedEntity)
-                                        .build();
-        //Break the request with "abortWith" method
-        requestContext.abortWith(unauthorizedStatus);
     }
     
 }

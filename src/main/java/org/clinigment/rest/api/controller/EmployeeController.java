@@ -9,10 +9,12 @@ import javax.persistence.EntityNotFoundException;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.UserTransaction;
+import javax.ws.rs.core.Response;
 import org.clinigment.rest.api.controller.exceptions.NonexistentEntityException;
 import org.clinigment.rest.api.controller.exceptions.RollbackFailureException;
 import org.clinigment.rest.api.model.Employee;
 import org.clinigment.rest.api.model.EmployeeAddress;
+import org.clinigment.rest.api.model.UserAccount;
 
 /**
  *
@@ -152,6 +154,43 @@ public class EmployeeController implements Serializable {
             return q.getResultList();
         } finally {
             em.close();
+        }
+    }
+
+    //####################################################
+    //#########     User Accounts       ##################
+    //####################################################
+    public UserAccount findUserAccount(Long employeeId) {
+        return findEmployee(employeeId).getUserAccount();
+        
+    }
+
+    public void createUserAccount(Long employeeId, UserAccount userAccount) throws RollbackFailureException, Exception {
+        EntityManager em = null;
+        try {
+            userTransaction.begin();
+            em = getEntityManager();
+            
+            Employee emp = em.find(Employee.class, employeeId);
+            System.out.println("Log " + userAccount);
+            userAccount.setEmployee(emp);
+            userAccount.updateUsername();
+            emp.setUserAccount(userAccount);
+            em.merge(emp);
+                       
+            //Commit transaction
+            userTransaction.commit();
+        } catch (Exception ex) {
+            try {
+                userTransaction.rollback();
+            } catch (Exception re) {
+                throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
+            }
+            throw ex;
+        } finally {
+            if (em != null) {
+                em.close();
+            }
         }
     }
 }

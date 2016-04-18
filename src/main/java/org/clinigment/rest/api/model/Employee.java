@@ -4,6 +4,7 @@ package org.clinigment.rest.api.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -17,6 +18,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.clinigment.rest.api.model.adapters.LocalDateAdapter;
 import org.clinigment.rest.api.model.converters.LocalDateAttributeConverter;
@@ -32,6 +34,7 @@ import org.clinigment.rest.api.model.enums.EmpRole;
 @XmlRootElement
 public class Employee implements Serializable {
     
+    private static final long serialVersionUID = 1L;
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -84,6 +87,9 @@ public class Employee implements Serializable {
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     private EmployeeAddress employeeAddress;
     
+    @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
+    private UserAccount userAccount;
+    
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
     
@@ -98,7 +104,23 @@ public class Employee implements Serializable {
         this.id = id;
     }
 
-    public Employee(Long employeeId, String title, String firstName, String lastName, String middleName, LocalDate dateOfBirth, String ppsNumber, LocalDate employedSince, LocalDate employedUntil, EmpRole role, String mobilePhone, String homePhone, String email, EmployeeAddress employeeAddress, Timestamp createdAt, Timestamp updatedAt) {
+    public Employee(Long employeeId, 
+            String title, 
+            String firstName, 
+            String lastName, 
+            String middleName, 
+            LocalDate dateOfBirth, 
+            String ppsNumber, 
+            LocalDate employedSince, 
+            LocalDate employedUntil, 
+            EmpRole role, 
+            String mobilePhone, 
+            String homePhone, 
+            String email, 
+            EmployeeAddress employeeAddress, 
+            UserAccount userAccount,
+            Timestamp createdAt, 
+            Timestamp updatedAt) {
         this.id = employeeId;
         this.title = title;
         this.firstName = firstName;
@@ -113,6 +135,7 @@ public class Employee implements Serializable {
         this.homePhone = homePhone;
         this.email = email;
         this.employeeAddress = employeeAddress;
+        this.userAccount = userAccount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -242,6 +265,43 @@ public class Employee implements Serializable {
         this.updatedAt = updatedAt;
     }
 
+    @XmlTransient
+    public UserAccount getUserAccount() {
+        return userAccount;
+    }
+
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
+
+    //Same as Patient, PPS number is unique in employee table as well.
+    //So I used PPS number for hashing and for equals functions.
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 89 * hash + Objects.hashCode(this.ppsNumber);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Employee other = (Employee) obj;
+        if (!Objects.equals(this.ppsNumber, other.ppsNumber)) {
+            return false;
+        }
+        return true;
+    }
+
+    
     @Override
     public String toString() {
         return "Employee{" + "employeeId=" + id + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", ppsNumber=" + ppsNumber + ", employedSince=" + employedSince + ", employedUntil=" + employedUntil + ", role=" + role + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", email=" + email + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';

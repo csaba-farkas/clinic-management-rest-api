@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 public class EmployeeAddress implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+    
     @Id
     @Column(name = "EMPLOYEE_ID", nullable = false)
     private Long empId;

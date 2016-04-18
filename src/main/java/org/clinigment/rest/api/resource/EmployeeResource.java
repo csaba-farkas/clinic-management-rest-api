@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import org.clinigment.rest.api.controller.EmployeeController;
 import org.clinigment.rest.api.model.Employee;
 import org.clinigment.rest.api.model.Patient;
+import org.clinigment.rest.api.model.UserAccount;
 
 /**
  *
@@ -63,11 +64,11 @@ public class EmployeeResource {
 
     @PUT
     @Path("{id}")
-    public Response edit(Patient entity, @PathParam("id") Long id) {
+    public Response edit(Employee entity, @PathParam("id") Long id) {
         try {
             Date now = Calendar.getInstance().getTime();
             entity.setUpdatedAt(new Timestamp(now.getTime()));
-            //getController().edit(entity);
+            getController().edit(entity);
             return Response.ok().build();
         } catch (Exception ex) {
             return Response.notModified(ex.getMessage()).build();
@@ -78,7 +79,7 @@ public class EmployeeResource {
     @Path("{id}")
     public Response remove(@PathParam("id") Long id) {
         try {
-            //getController().destroy(id);
+            getController().destroy(id);
             return Response.ok().build();
         } catch (Exception ex) {
             return Response.notModified(ex.getMessage()).build();
@@ -87,14 +88,35 @@ public class EmployeeResource {
 
     @GET
     @Path("{id}")
-    public Employee find(@PathParam("id") Long id) {
-        System.out.println("Log employee get by id: " + getController().findEmployee(id));
-        return getController().findEmployee(id);
+    public Employee find(@PathParam("id") Long employeeId) {
+        return getController().findEmployee(employeeId);
     }
 
     @GET
     public List<Employee> findAll() {
         return getController().findAllEmployees();
+    }
+   
+    //#################################################
+    //#####         User account resources      #######
+    //#################################################
+    @GET
+    @Path("{id}/useraccounts")
+    public UserAccount findUserAccount(@PathParam("id") Long employeeId) {
+        return getController().findUserAccount(employeeId);
+    }
+    
+    @POST
+    @Path("{id}/useraccounts")
+    public Response createUserAccount(@PathParam("id") Long employeeId, UserAccount userAccount) {
+        try {
+            Date now = Calendar.getInstance().getTime();
+            userAccount.setCreatedAt(new Timestamp(now.getTime()));
+            getController().createUserAccount(employeeId, userAccount);
+            return Response.created(null).build();
+        } catch(Exception ex) {
+            return Response.notModified("Employee already has a user account.").build();
+        }
     }
     
 }
