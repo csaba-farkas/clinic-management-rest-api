@@ -1,8 +1,6 @@
 
 package org.clinigment.rest.api.resource;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
@@ -23,7 +21,6 @@ import org.clinigment.rest.api.model.UnauthorizedEntity;
  *
  * @author csaba
  */
-
 @Path("login")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -35,8 +32,7 @@ public class LoginResource {
 
     private LoginController getController() {
         try {
-            UserTransaction utx = (UserTransaction) new InitialContext().lookup("java:comp/UserTransaction");
-            return new LoginController(utx, getEntityManagerFactory());
+            return new LoginController(getEntityManagerFactory());
         } catch (NamingException ex) {
             throw new RuntimeException(ex);
         }
@@ -46,6 +42,12 @@ public class LoginResource {
         
     }
     
+    /**
+     * Login resource.
+     * 
+     * @param loginForm LoginForm sent from client
+     * @return a Response with 200 or 401 status
+     */
     @POST
     public Response login(LoginForm loginForm) {
         try {

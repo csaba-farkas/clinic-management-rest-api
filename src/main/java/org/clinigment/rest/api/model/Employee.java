@@ -4,6 +4,8 @@ package org.clinigment.rest.api.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,6 +16,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
@@ -90,6 +93,9 @@ public class Employee implements Serializable {
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     private UserAccount userAccount;
     
+    @OneToMany(mappedBy = "employee")
+    private List<Appointment> appointmentCollection;
+    
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
     
@@ -117,7 +123,6 @@ public class Employee implements Serializable {
             String mobilePhone, 
             String homePhone, 
             String email, 
-            EmployeeAddress employeeAddress, 
             UserAccount userAccount,
             Timestamp createdAt, 
             Timestamp updatedAt) {
@@ -134,10 +139,13 @@ public class Employee implements Serializable {
         this.mobilePhone = mobilePhone;
         this.homePhone = homePhone;
         this.email = email;
-        this.employeeAddress = employeeAddress;
+        this.employeeAddress = new EmployeeAddress();
         this.userAccount = userAccount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        
+        //Collection
+        this.appointmentCollection = new ArrayList<>();
     }
 
     @XmlID
@@ -272,6 +280,15 @@ public class Employee implements Serializable {
 
     public void setUserAccount(UserAccount userAccount) {
         this.userAccount = userAccount;
+    }
+
+    @XmlTransient
+    public List<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
+    }
+
+    public void setAppointmentCollection(List<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
     }
 
     //Same as Patient, PPS number is unique in employee table as well.

@@ -4,10 +4,7 @@ package org.clinigment.rest.api.controller;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import javax.persistence.TypedQuery;
-import javax.transaction.UserTransaction;
 import org.clinigment.rest.api.controller.exceptions.LoginException;
-import org.clinigment.rest.api.controller.exceptions.NonexistentEntityException;
 import org.clinigment.rest.api.model.LoginForm;
 import org.clinigment.rest.api.model.UserAccount;
 
@@ -17,11 +14,9 @@ import org.clinigment.rest.api.model.UserAccount;
  */
 public class LoginController {
     
-    private UserTransaction userTransaction = null;
     private EntityManagerFactory emFactory = null;
     
-    public LoginController(UserTransaction userTransaction, EntityManagerFactory emFactory) {
-        this.userTransaction = userTransaction;
+    public LoginController(EntityManagerFactory emFactory) {
         this.emFactory = emFactory;
     }
     
@@ -35,9 +30,12 @@ public class LoginController {
         String username = loginForm.getUsername();
         String password = loginForm.getPassword();
 
-        List<UserAccount> resultList = emFactory.createEntityManager().createNativeQuery("SELECT * FROM system_user WHERE USERNAME = '" + loginForm.getUsername() + "';", UserAccount.class).getResultList();
+        List<UserAccount> resultList = emFactory
+                .createEntityManager()
+                .createNativeQuery("SELECT * FROM system_user WHERE USERNAME = '" + username + "';", UserAccount.class)
+                .getResultList();
         
-        if(resultList.size() == 0) {
+        if(resultList.isEmpty()) {
             throw new LoginException();
         }
         

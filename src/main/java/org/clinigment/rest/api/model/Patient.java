@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.clinigment.rest.api.model.adapters.LocalDateAdapter;
 import org.clinigment.rest.api.model.converters.LocalDateAttributeConverter;
@@ -94,6 +95,8 @@ public class Patient implements Serializable {
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
     private PatientAddress patientAddress;
     
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<Appointment> appointmentCollection;
             
     public Patient() {
         //Empty constructor for JPA
@@ -103,7 +106,21 @@ public class Patient implements Serializable {
         this.id = id;
     }
 
-    public Patient(Long id, String title, String firstName, String middleName, String lastName, String ppsNumber, LocalDate dateOfBirth, Gender gender, String email, String mobilePhone, String homePhone, String nextOfKinName, String nextOfKinContact, Timestamp createdAt, Timestamp updatedAt) {
+    public Patient(Long id, 
+            String title, 
+            String firstName, 
+            String middleName, 
+            String lastName, 
+            String ppsNumber, 
+            LocalDate dateOfBirth, 
+            Gender gender, 
+            String email, 
+            String mobilePhone, 
+            String homePhone, 
+            String nextOfKinName, 
+            String nextOfKinContact, 
+            Timestamp createdAt, 
+            Timestamp updatedAt) {
         this.id = id;
         this.title = title;
         this.firstName = firstName;
@@ -125,6 +142,7 @@ public class Patient implements Serializable {
         
         //Collections
         this.allergyCollection = new ArrayList<>();
+        this.appointmentCollection = new ArrayList<>();
     }
 
     /**
@@ -278,6 +296,25 @@ public class Patient implements Serializable {
         this.allergyCollection = allergyCollection;
     }
 
+    public PatientAddress getPatientAddress() {
+        return patientAddress;
+    }
+
+    public void setPatientAddress(PatientAddress patientAddress) {
+        this.patientAddress = patientAddress;
+    }
+
+    @XmlTransient
+    public List<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
+    }
+
+    public void setAppointmentCollection(List<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
+    }
+    
+    
+
     @Override
     public int hashCode() {
         int hash = 5;
@@ -312,14 +349,11 @@ public class Patient implements Serializable {
         return true;
     }
 
-    
-
-    
-    
     @Override
     public String toString() {
-        return "Patient{" + "id=" + id + ", title=" + title + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", ppsNumber=" + ppsNumber + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", email=" + email + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", address=" + patientAddress + ", nextOfKinName=" + nextOfKinName + ", nextOfKinContact=" + nextOfKinContact + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", allergyCollection=" + allergyCollection + '}';
+        return "Patient{" + "id=" + id + ", title=" + title + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", ppsNumber=" + ppsNumber + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", email=" + email + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", nextOfKinName=" + nextOfKinName + ", nextOfKinContact=" + nextOfKinContact + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", allergyCollection=" + allergyCollection + ", patientAddress=" + patientAddress + ", appointmentCollection=" + appointmentCollection + '}';
     }
-    
+
+       
        
 }
