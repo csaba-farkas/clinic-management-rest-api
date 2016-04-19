@@ -95,10 +95,11 @@ public class PatientController implements Serializable {
 
     public void edit(Patient patient) throws NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
+        System.out.println("Log in PatientController 'edit' method: " + patient);
         try {
             utx.begin();
             em = getEntityManager();
-            patient = em.merge(patient);
+            em.merge(patient);
             utx.commit();
         } catch (Exception ex) {
             try {
