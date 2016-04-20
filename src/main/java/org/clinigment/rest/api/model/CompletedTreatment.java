@@ -31,16 +31,9 @@ public class CompletedTreatment implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "COMP_TREATMENT_ID")
     private Long id;
-    
-    @Column(name = "RECORD_ID", nullable = false, updatable = false)
-    private Long appointmentRecordId;
-    
+        
     @Column(name = "TREATMENT_ID", nullable = false, updatable =false)
     private Long treatmentId;
-    
-    @ManyToOne
-    @JoinColumn(name = "RECORD_ID", referencedColumnName = "RECORD_ID", insertable = false, nullable = false, updatable =false)
-    private AppointmentRecord appointmentRecord;
     
     @ManyToOne
     @JoinColumn(name = "TREATMENT_ID", referencedColumnName = "TREATMENT_ID", insertable = false, nullable = false, updatable =false)
@@ -64,30 +57,15 @@ public class CompletedTreatment implements Serializable {
 
     public CompletedTreatment(Long id, Long appointmentRecordId, Long treatmentId, AppointmentRecord appointmentRecord, Treatment treatment, int quantity, Timestamp createdAt, Timestamp updatedAt) {
         this.id = id;
-        this.appointmentRecordId = appointmentRecordId;
         this.treatmentId = treatmentId;
-        this.appointmentRecord = appointmentRecord;
         this.treatment = treatment;
         this.quantity = quantity;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public Long getAppointmentRecordId() {
-        return appointmentRecordId;
-    }
-
     public Long getTreatmentId() {
         return treatmentId;
-    }
-
-    @XmlTransient
-    public AppointmentRecord getAppointmentRecord() {
-        return appointmentRecord;
-    }
-
-    public void setAppointmentRecord(AppointmentRecord appointmentRecord) {
-        this.appointmentRecord = appointmentRecord;
     }
 
     @XmlTransient
@@ -126,7 +104,6 @@ public class CompletedTreatment implements Serializable {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 31 * hash + Objects.hashCode(this.appointmentRecordId);
         hash = 31 * hash + Objects.hashCode(this.treatmentId);
         return hash;
     }
@@ -143,9 +120,7 @@ public class CompletedTreatment implements Serializable {
             return false;
         }
         final CompletedTreatment other = (CompletedTreatment) obj;
-        if (!Objects.equals(this.appointmentRecordId, other.appointmentRecordId)) {
-            return false;
-        }
+        
         if (!Objects.equals(this.treatmentId, other.treatmentId)) {
             return false;
         }
@@ -154,6 +129,6 @@ public class CompletedTreatment implements Serializable {
 
     @Override
     public String toString() {
-        return "CompletedTreatment{" + "appointmentRecordId=" + appointmentRecordId + ", treatmentId=" + treatmentId + ", appointmentRecord=" + appointmentRecord + ", treatment=" + treatment + ", quantity=" + quantity + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+        return "CompletedTreatment{treatmentId=" + treatmentId + ", treatment=" + treatment + ", quantity=" + quantity + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }    
 }

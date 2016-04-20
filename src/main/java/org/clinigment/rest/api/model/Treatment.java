@@ -44,9 +44,6 @@ public class Treatment implements Serializable {
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
     
-    @OneToMany(mappedBy = "treatment", cascade = CascadeType.ALL)
-    private List<CompletedTreatment> completedTreatments;
-
     public Treatment() {
     }
 
@@ -57,7 +54,6 @@ public class Treatment implements Serializable {
     public Treatment(Long id, String name) {
         this.id = id;
         this.name = name;
-        this.completedTreatments = new ArrayList<>();
     }
 
     public Long getId() {
@@ -88,14 +84,6 @@ public class Treatment implements Serializable {
         this.updatedAt = updatedAt;
     }
 
-    @XmlTransient
-    public List<CompletedTreatment> getCompletedTreatments() {
-        return completedTreatments;
-    }
-
-    public void setCompletedTreatments(List<CompletedTreatment> completedTreatments) {
-        this.completedTreatments = completedTreatments;
-    }
 
     @Override
     public int hashCode() {
@@ -124,6 +112,6 @@ public class Treatment implements Serializable {
 
     @Override
     public String toString() {
-        return "Treatment{" + "id=" + id + ", name=" + name + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", completedTreatments=" + completedTreatments + '}';
+        return "Treatment{" + "id=" + id + ", name=" + name + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     } 
 }

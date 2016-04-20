@@ -53,7 +53,8 @@ public class AppointmentRecord implements Serializable {
     @JoinColumn(name = "DOCTOR_ID", referencedColumnName = "EMPLOYEE_ID", insertable = false, updatable = false)
     private Employee employee;
     
-    @OneToMany(mappedBy = "appointmentRecord", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "COMP_TREATMENT_ID", referencedColumnName = "RECORD_ID")
     private List<CompletedTreatment> completedTreatments;
     
     @Column(name = "CREATED_AT")
