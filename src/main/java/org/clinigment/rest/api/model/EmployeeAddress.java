@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
- * @author csaba
+ * @author Csaba Farkas
  */
 @Entity
 @Table(name = "employee_address")
