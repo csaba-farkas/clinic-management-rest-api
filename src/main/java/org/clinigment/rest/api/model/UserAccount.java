@@ -50,7 +50,7 @@ public class UserAccount implements Serializable {
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
     
-    @OneToOne
+    @OneToOne(targetEntity = Employee.class, optional = false, orphanRemoval = true)
     @PrimaryKeyJoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
     private Employee employee;
 

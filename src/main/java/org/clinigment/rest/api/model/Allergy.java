@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package org.clinigment.rest.api.model;
 
 import java.io.Serializable;
@@ -28,7 +24,7 @@ public class Allergy implements Serializable {
     @Column(name = "PATIENT_ID", nullable = false)
     private Long patientId;
     
-    @ManyToOne
+    @ManyToOne(targetEntity = Patient.class, optional = true)
     @PrimaryKeyJoinColumn(name = "PATIENT_ID", referencedColumnName = "PATIENT_ID")
     private Patient patient;
     

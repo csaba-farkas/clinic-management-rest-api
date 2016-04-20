@@ -26,7 +26,7 @@ public class EmployeeAddress implements Serializable {
     @Column(name = "EMPLOYEE_ID", nullable = false)
     private Long empId;
     
-    @OneToOne
+    @OneToOne(targetEntity = Employee.class, optional = false, orphanRemoval = true)
     @PrimaryKeyJoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
     private Employee employee;
     

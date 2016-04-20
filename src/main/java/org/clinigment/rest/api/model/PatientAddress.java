@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -24,8 +25,8 @@ public class PatientAddress implements Serializable {
     @Column(name = "PATIENT_ID", nullable = false)
     private Long patientId;
     
-    @OneToOne
-    @PrimaryKeyJoinColumn(name = "PATIENT_ID", referencedColumnName = "PATIENT_ID")
+    @OneToOne(targetEntity = Patient.class, optional = false, orphanRemoval = true)
+    @JoinColumn(name = "PATIENT_ID", referencedColumnName = "PATIENT_ID", nullable = false, updatable = false, insertable = false)
     private Patient patient;
     
     @Column(name = "ADDRESS_LINE1", nullable = false, length = 255)
