@@ -56,11 +56,11 @@ public class Appointment implements Serializable {
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime endTime;
     
-    @Column(name = "PATIENT_ID", updatable = false)
+    @Column(name = "appPATIENT_ID", updatable = false, insertable = false)
     private Long patientId;
     
     @ManyToOne
-    @JoinColumn(name = "PATIENT_ID", referencedColumnName = "PATIENT_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "appPATIENT_ID", referencedColumnName = "PATIENT_ID", insertable = false, updatable = false)
     private Patient patient;
     
     @Column(name = "PATIENT_NAME")

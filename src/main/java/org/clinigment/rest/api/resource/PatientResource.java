@@ -54,7 +54,9 @@ public class PatientResource {
             Date now = Calendar.getInstance().getTime();
             entity.setCreatedAt(new Timestamp(now.getTime()));
             getController().create(entity);
-            return Response.created(URI.create(entity.getId().toString())).build();
+            return Response.created(URI.create(entity.getId().toString()))
+                    .entity(entity)
+                    .build();
         } catch (Exception ex) {
             return Response.notModified("Patient with PPS number entered, already exists.").build();
         }
@@ -67,7 +69,7 @@ public class PatientResource {
             Date now = Calendar.getInstance().getTime();
             entity.setUpdatedAt(new Timestamp(now.getTime()));
             getController().edit(entity);
-            return Response.ok().build();
+            return Response.ok().entity(getController().findPatient(id)).build();
         } catch (Exception ex) {
             return Response.notModified(ex.getMessage()).build();
         }

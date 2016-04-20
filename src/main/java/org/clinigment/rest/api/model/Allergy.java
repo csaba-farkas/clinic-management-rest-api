@@ -5,11 +5,9 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -20,22 +18,22 @@ import javax.xml.bind.annotation.XmlTransient;
 @XmlRootElement
 public class Allergy implements Serializable {
     
+    
+    
     @Id
-    @Column(name = "PATIENT_ID", nullable = false)
+    @Column(name = "pPATIENT_ID")
+    @XmlID
     private Long patientId;
     
-    @ManyToOne(targetEntity = Patient.class, optional = true)
-    @PrimaryKeyJoinColumn(name = "PATIENT_ID", referencedColumnName = "PATIENT_ID")
-    private Patient patient;
-    
-    @Column(name = "ALLERGY_TYPE", nullable = false)
+    @Id
+    @Column(name = "ALLERGY_TYPE")
     private String allergyType;
-    
-    public Allergy(Patient patient, String allergyType) {
-        this.patientId = patient.getId();
-        this.patient = patient;
+
+    public Allergy(Long patientId, String allergyType) {
+        this.patientId = patientId;
         this.allergyType = allergyType;
     }
+    
     
     public Allergy() { 
         //Empty constructor for JPA    
@@ -45,14 +43,11 @@ public class Allergy implements Serializable {
         return patientId;
     }
     
-    @XmlTransient
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-        this.patientId = this.patient.getId();
+    public void setPatientId(Long patientId) {
+        //patient Id can only be set if it is null (ie. at creation)
+        if(this.patientId == null && patientId != null) {
+            this.patientId = patientId;
+        }
     }
 
     public String getAllergyType() {

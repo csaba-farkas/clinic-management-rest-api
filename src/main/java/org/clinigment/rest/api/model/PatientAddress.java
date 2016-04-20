@@ -7,8 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -23,6 +23,7 @@ public class PatientAddress implements Serializable {
     
     @Id
     @Column(name = "PATIENT_ID", nullable = false)
+    @XmlID
     private Long patientId;
     
     @OneToOne(targetEntity = Patient.class, optional = false, orphanRemoval = true)
@@ -47,7 +48,13 @@ public class PatientAddress implements Serializable {
     @Column(name = "COUNTRY", length = 100)
     private String country;
 
-    public PatientAddress(Patient patient, String addressLine1, String addressLine2, String addressLine3, String cityTown, String county, String country) {
+    public PatientAddress(Patient patient, 
+            String addressLine1, 
+            String addressLine2, 
+            String addressLine3, 
+            String cityTown, 
+            String county, 
+            String country) {
         this.patientId = patient.getId();
         this.patient = patient;
         this.addressLine1 = addressLine1;
@@ -132,5 +139,14 @@ public class PatientAddress implements Serializable {
     @Override
     public String toString() {
         return "PatientAddress{" + "patientId=" + patientId + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2 + ", addressLine3=" + addressLine3 + ", cityTown=" + cityTown + ", county=" + county + ", country=" + country + '}';
+    }
+
+    void update(PatientAddress patientAddress) {
+        this.addressLine1 = patientAddress.getAddressLine1();
+        this.addressLine2 = patientAddress.getAddressLine2();
+        this.addressLine3 = patientAddress.getAddressLine3();
+        this.cityTown = patientAddress.getCityTown();
+        this.county = patientAddress.getCounty();
+        this.country = patientAddress.getCountry();
     }
 }

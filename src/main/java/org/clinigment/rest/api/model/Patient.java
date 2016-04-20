@@ -17,15 +17,16 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.clinigment.rest.api.model.adapters.LocalDateAdapter;
 import org.clinigment.rest.api.model.converters.LocalDateAttributeConverter;
 import org.clinigment.rest.api.model.enums.Gender;
+import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  *
@@ -36,11 +37,9 @@ import org.clinigment.rest.api.model.enums.Gender;
 @XmlRootElement
 public class Patient implements Serializable {
 
-    
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PATIENT_ID", updatable = false, nullable = false)
+    @Column(name = "PATIENT_ID", updatable = false, nullable = true)
     private Long id;
     
     @Column(name = "TITLE", length = 5)
@@ -89,14 +88,15 @@ public class Patient implements Serializable {
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
     
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "pPATIENT_ID", referencedColumnName = "PATIENT_ID", nullable = true, updatable = true, insertable = true)
+    @PrivateOwned
     private List<Allergy> allergyCollection;
     
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    @PrivateOwned
     private PatientAddress patientAddress;
     
-    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
-    private List<Appointment> appointmentCollection;
             
     public Patient() {
         //Empty constructor for JPA
@@ -142,7 +142,7 @@ public class Patient implements Serializable {
         
         //Collections
         this.allergyCollection = new ArrayList<>();
-        this.appointmentCollection = new ArrayList<>();
+        //this.appointmentCollection = new ArrayList<>();
     }
 
     /**
@@ -295,7 +295,7 @@ public class Patient implements Serializable {
     public void setAllergyCollection(List<Allergy> allergyCollection) {
         this.allergyCollection = allergyCollection;
     }
-
+    
     public PatientAddress getPatientAddress() {
         return patientAddress;
     }
@@ -304,16 +304,53 @@ public class Patient implements Serializable {
         this.patientAddress = patientAddress;
     }
 
-    @XmlTransient
-    public List<Appointment> getAppointmentCollection() {
-        return appointmentCollection;
+    public void update(Patient patient) {
+        this.title = patient.getTitle();
+        this.firstName = patient.getFirstName();
+        this.middleName = patient.getMiddleName();
+        this.lastName = patient.getLastName();
+        this.ppsNumber = patient.getPpsNumber();
+        this.dateOfBirth = patient.getDateOfBirth();
+        this.gender = patient.getGender();
+        this.email = patient.getEmail();
+        this.mobilePhone = patient.getMobilePhone();
+        this.homePhone = patient.getHomePhone();
+        this.nextOfKinName = patient.getNextOfKinName();
+        this.nextOfKinContact = patient.getNextOfKinContact();
+        
+        //Allergy collection
+        if(patient.getAllergyCollection() == null || patient.getAllergyCollection().isEmpty()) {
+            //If new collection is empty, clear old collection
+            this.allergyCollection.clear();
+        } else {
+            //If new collection is shorter than old collection, remove the "overflow" allergies
+            //from old collection
+            if(this.allergyCollection.size() > patient.getAllergyCollection().size()) {
+                for(int i = patient.getAllergyCollection().size(); i < this.allergyCollection.size(); i++) {
+                    this.allergyCollection.remove(i);
+                }
+            }
+            //Replace old allergy details with new allergies, and add any "overflow" new allergy to 
+            //the list
+            for(int i = 0; i < patient.getAllergyCollection().size(); i++) {
+                if(i < this.allergyCollection.size()) {
+                    this.allergyCollection.get(i).setPatientId(
+                            patient.getAllergyCollection().get(i).getPatientId()
+                    );
+                    this.allergyCollection.get(i).setAllergyType(
+                            patient.getAllergyCollection().get(i).getAllergyType()
+                    );
+                } else {
+                    this.allergyCollection.add(patient.getAllergyCollection().get(i));
+                }
+            }
+        }
+        
+        //Patient address
+        this.patientAddress.update(patient.getPatientAddress());
+        this.updatedAt = patient.getUpdatedAt();
+        //createdAt is not updated
     }
-
-    public void setAppointmentCollection(List<Appointment> appointmentCollection) {
-        this.appointmentCollection = appointmentCollection;
-    }
-    
-    
 
     @Override
     public int hashCode() {
@@ -351,7 +388,7 @@ public class Patient implements Serializable {
 
     @Override
     public String toString() {
-        return "Patient{" + "id=" + id + ", title=" + title + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", ppsNumber=" + ppsNumber + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", email=" + email + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", nextOfKinName=" + nextOfKinName + ", nextOfKinContact=" + nextOfKinContact + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", allergyCollection=" + allergyCollection + ", patientAddress=" + patientAddress + ", appointmentCollection=" + appointmentCollection + '}';
+        return "Patient{" + "id=" + id + ", title=" + title + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", ppsNumber=" + ppsNumber + ", dateOfBirth=" + dateOfBirth + ", gender=" + gender + ", email=" + email + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", nextOfKinName=" + nextOfKinName + ", nextOfKinContact=" + nextOfKinContact + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", allergyCollection=" + allergyCollection + ", patientAddress=" + patientAddress + '}';
     }
 
        

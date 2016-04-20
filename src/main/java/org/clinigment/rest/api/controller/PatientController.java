@@ -7,7 +7,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.UserTransaction;
@@ -36,6 +35,12 @@ public class PatientController implements Serializable {
         return emf.createEntityManager();
     }
 
+    /**
+     * Create new patient record
+     * @param patient
+     * @throws RollbackFailureException
+     * @throws Exception 
+     */
     public void create(Patient patient) throws RollbackFailureException, Exception {
         EntityManager em = null;
         System.out.println("Log " + patient);
@@ -44,7 +49,7 @@ public class PatientController implements Serializable {
             em = getEntityManager();
             
             //Address - detach address to avoid nullpointer exception on patient id and store it temp
-            PatientAddress tempAddress = null;
+            PatientAddress tempAddress = new PatientAddress();
             System.out.println("log address: " + patient.getAddress());
             if(patient.getAddress() != null) {
                 tempAddress = patient.getAddress();
@@ -70,7 +75,7 @@ public class PatientController implements Serializable {
             
             //Modify allergy types with patient (now with id)
             for(int i = 0; i < bufferedAllergyCollection.size(); i++) {
-                bufferedAllergyCollection.get(i).setPatient(patient);
+                bufferedAllergyCollection.get(i).setPatientId(patient.getId());
             }
             patient.setAllergyCollection(bufferedAllergyCollection);
             
@@ -93,13 +98,25 @@ public class PatientController implements Serializable {
         }
     }
 
-    public void edit(Patient patient) throws NonexistentEntityException, RollbackFailureException, Exception {
+    /**
+     * Update and existing patient record.
+     * 
+     * @param newPatient is a Patient object with 'new' details
+     * @throws NonexistentEntityException
+     * @throws RollbackFailureException
+     * @throws Exception 
+     */
+    public void edit(Patient newPatient) throws NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
-        System.out.println("Log in PatientController 'edit' method: " + patient);
         try {
             utx.begin();
             em = getEntityManager();
-            em.merge(patient);
+            
+            //Find patient-to-update in database
+            Patient oldPatient = em.find(Patient.class, newPatient.getId());
+            //Call update method of patient entity class to update patient
+            oldPatient.update(newPatient);
+            
             utx.commit();
         } catch (Exception ex) {
             try {
@@ -109,7 +126,7 @@ public class PatientController implements Serializable {
             }
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Long id = patient.getId();
+                Long id = newPatient.getId();
                 if (findPatient(id) == null) {
                     throw new NonexistentEntityException("The patient with id " + id + " no longer exists.");
                 }
@@ -127,12 +144,9 @@ public class PatientController implements Serializable {
         try {
             utx.begin();
             em = getEntityManager();
-            Patient patient;
-            try {
-                patient = em.getReference(Patient.class, id);
-                patient.getId();
-            } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The patient with id " + id + " no longer exists.", enfe);
+            Patient patient = em.getReference(Patient.class, id);
+            if(patient == null) {
+                throw new NonexistentEntityException("The patient with id " + id + " no longer exists.");
             }
             em.remove(patient);
             utx.commit();
