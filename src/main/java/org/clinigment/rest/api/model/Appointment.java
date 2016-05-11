@@ -17,6 +17,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.clinigment.rest.api.model.adapters.LocalDateAdapter;
 import org.clinigment.rest.api.model.adapters.LocalDateTimeAdapter;
@@ -58,11 +59,7 @@ public class Appointment implements Serializable {
     
     @Column(name = "appPATIENT_ID", updatable = false, insertable = false)
     private Long patientId;
-    
-    @ManyToOne
-    @JoinColumn(name = "appPATIENT_ID", referencedColumnName = "PATIENT_ID", insertable = false, updatable = false)
-    private Patient patient;
-    
+        
     @Column(name = "PATIENT_NAME")
     private String patientName;
     
@@ -72,12 +69,8 @@ public class Appointment implements Serializable {
     @Column(name = "DESCRIPTION")
     private String description;
     
-    @Column(name = "DOCTOR_ID", updatable = false)
+    @Column(name = "appEMPLOYEE_ID")
     private Long doctorId;
-    
-    @ManyToOne
-    @JoinColumn(name = "DOCTOR_ID", referencedColumnName = "EMPLOYEE_ID", insertable = false, updatable = false)
-    private Employee employee;
     
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
@@ -96,26 +89,28 @@ public class Appointment implements Serializable {
     public Appointment(Long id, 
             LocalDate date, 
             LocalDateTime startTime, 
-            LocalDateTime endTime, 
-            Long patientId, 
-            Patient patient, 
+            LocalDateTime endTime,
+            Long patientId,
             String patientName, 
             String contactNumber, 
             String description, 
-            Long doctorId, 
-            Employee employee) {
+            Long employeeId,
+            Timestamp createdAt, 
+            Timestamp updatedAt) {
         this.id = id;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
         this.patientId = patientId;
-        this.patient = patient;
         this.patientName = patientName;
         this.contactNumber = contactNumber;
         this.description = description;
-        this.doctorId = doctorId;
-        this.employee = employee;
+        this.doctorId = employeeId;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
+
+    
 
     public Long getId() {
         return id;
@@ -149,15 +144,10 @@ public class Appointment implements Serializable {
         return patientId;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
     }
-
-    public void setPatient(Patient patient) {
-        this.patientId = patient.getId();
-        this.patient = patient;
-    }
-
+    
     public String getPatientName() {
         return patientName;
     }
@@ -182,17 +172,12 @@ public class Appointment implements Serializable {
         this.description = description;
     }
 
-    public void setDoctorId(Long doctorId) {
-        this.doctorId = doctorId;
+    public Long getDoctorId() {
+        return doctorId;
     }
 
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.doctorId = employee.getId();
-        this.employee = employee;
+    public void setDoctorId(Long empId) {
+        this.doctorId = empId;
     }
 
     public Timestamp getCreatedAt() {
@@ -238,10 +223,6 @@ public class Appointment implements Serializable {
 
     @Override
     public String toString() {
-        return "Appointment{" + "id=" + id + ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", patientId=" + patientId + ", patient=" + patient + ", patientName=" + patientName + ", contactNumber=" + contactNumber + ", description=" + description + ", doctorId=" + doctorId + ", employee=" + employee + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
-    }
-    
-    
-    
-    
+        return "Appointment{" + "id=" + id + ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", patientId=" + patientId + ", patientName=" + patientName + ", contactNumber=" + contactNumber + ", description=" + description + ", doctorId=" + doctorId + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+    }   
 }

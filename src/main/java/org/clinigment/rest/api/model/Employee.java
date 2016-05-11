@@ -16,6 +16,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -93,8 +95,9 @@ public class Employee implements Serializable {
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     private UserAccount userAccount;
     
-    @OneToMany(mappedBy = "employee")
-    private List<Appointment> appointmentCollection;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "appEMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID", nullable = true, updatable = true, insertable = true)
+    private List<Appointment> appointments;
     
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
@@ -143,9 +146,7 @@ public class Employee implements Serializable {
         this.userAccount = userAccount;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-        
-        //Collection
-        this.appointmentCollection = new ArrayList<>();
+        this.appointments = new ArrayList<>();
     }
 
     @XmlID
@@ -257,6 +258,15 @@ public class Employee implements Serializable {
         this.employeeAddress = employeeAddress;
     }
 
+    @XmlTransient
+    public List<Appointment> getAppointments() {
+        return appointments;
+    }
+
+    public void setAppointments(List<Appointment> appointments) {
+        this.appointments = appointments;
+    }
+
     public Timestamp getCreatedAt() {
         return createdAt;
     }
@@ -280,15 +290,6 @@ public class Employee implements Serializable {
 
     public void setUserAccount(UserAccount userAccount) {
         this.userAccount = userAccount;
-    }
-
-    @XmlTransient
-    public List<Appointment> getAppointmentCollection() {
-        return appointmentCollection;
-    }
-
-    public void setAppointmentCollection(List<Appointment> appointmentCollection) {
-        this.appointmentCollection = appointmentCollection;
     }
 
     //Same as Patient, PPS number is unique in employee table as well.
@@ -318,11 +319,12 @@ public class Employee implements Serializable {
         return true;
     }
 
-    
     @Override
     public String toString() {
-        return "Employee{" + "employeeId=" + id + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", ppsNumber=" + ppsNumber + ", employedSince=" + employedSince + ", employedUntil=" + employedUntil + ", role=" + role + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", email=" + email + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+        return "Employee{" + "id=" + id + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", ppsNumber=" + ppsNumber + ", employedSince=" + employedSince + ", employedUntil=" + employedUntil + ", role=" + role + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", email=" + email + ", employeeAddress=" + employeeAddress + ", userAccount=" + userAccount + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
+
+    
     
     
     

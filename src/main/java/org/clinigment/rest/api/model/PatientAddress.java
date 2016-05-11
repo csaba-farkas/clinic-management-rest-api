@@ -22,12 +22,12 @@ import javax.xml.bind.annotation.XmlTransient;
 public class PatientAddress implements Serializable {
     
     @Id
-    @Column(name = "PATIENT_ID", nullable = false)
+    @Column(name = "PATIENT_ID", nullable = false, unique = true)
     @XmlID
     private Long patientId;
     
     @OneToOne(targetEntity = Patient.class, optional = false, orphanRemoval = true)
-    @JoinColumn(name = "PATIENT_ID", referencedColumnName = "PATIENT_ID", nullable = false, updatable = false, insertable = false)
+    @JoinColumn(name = "PATIENT_ID", referencedColumnName = "PATIENT_ID", unique = true, nullable = false, updatable = false, insertable = false)
     private Patient patient;
     
     @Column(name = "ADDRESS_LINE1", nullable = false, length = 255)

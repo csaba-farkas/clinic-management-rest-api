@@ -7,8 +7,11 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.UserTransaction;
+import org.clinigment.rest.api.controller.exceptions.NonexistentEntityException;
 import org.clinigment.rest.api.controller.exceptions.RollbackFailureException;
 import org.clinigment.rest.api.model.Appointment;
+import org.clinigment.rest.api.model.Employee;
+import org.clinigment.rest.api.model.Patient;
 
 /**
  *
@@ -31,9 +34,23 @@ public class AppointmentController {
     public void create(Appointment appointment) throws RollbackFailureException, Exception {
         EntityManager em = null;
         System.out.println("Log " + appointment);
+        
+        
         try {
             userTransaction.begin();
             em = getEntityManager();
+            
+            String errorMessage = "";
+            if(em.find(Employee.class, appointment.getDoctorId()) == null) {
+                errorMessage += "Doctor/Hygienist with id " + appointment.getDoctorId() + " doesn't exist.";
+            }
+            if(em.find(Patient.class, appointment.getPatientId()) == null) {
+                errorMessage += "<br />Patient with id " + appointment.getPatientId() + " doesn't exist.";
+            }
+            
+            if(errorMessage.length() > 0) {
+                throw new NonexistentEntityException(errorMessage);
+            }
             
             em.persist(appointment);
             

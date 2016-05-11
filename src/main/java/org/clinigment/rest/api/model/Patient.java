@@ -85,13 +85,17 @@ public class Patient implements Serializable {
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
     
-    @Column(name = "UPDATED_AT")
+    @Column(name = "UPDATED_AT") 
     private Timestamp updatedAt;
     
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "pPATIENT_ID", referencedColumnName = "PATIENT_ID", nullable = true, updatable = true, insertable = true)
     @PrivateOwned
     private List<Allergy> allergyCollection;
+    
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "appPATIENT_ID", referencedColumnName = "PATIENT_ID", nullable = true, updatable = true, insertable = true)
+    private List<Appointment> appointmentCollection;
     
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
     @PrivateOwned
@@ -142,7 +146,7 @@ public class Patient implements Serializable {
         
         //Collections
         this.allergyCollection = new ArrayList<>();
-        //this.appointmentCollection = new ArrayList<>();
+        this.appointmentCollection = new ArrayList<>();
     }
 
     /**
@@ -270,6 +274,22 @@ public class Patient implements Serializable {
 
     public void setNextOfKinContact(String nextOfKinContact) {
         this.nextOfKinContact = nextOfKinContact;
+    }
+
+    public List<Appointment> getAppointmentCollection() {
+        return appointmentCollection;
+    }
+
+    public void setAppointmentCollection(List<Appointment> appointmentCollection) {
+        this.appointmentCollection = appointmentCollection;
+    }
+    
+    public void addAppointmetn(Appointment appointment) {
+        this.appointmentCollection.add(appointment);
+    }
+    
+    public void removeAppointment(int index) {
+        this.appointmentCollection.remove(index);
     }
 
     public Timestamp getCreatedAt() {

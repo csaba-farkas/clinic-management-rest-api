@@ -22,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.clinigment.rest.api.controller.EmployeeController;
 import org.clinigment.rest.api.model.Employee;
-import org.clinigment.rest.api.model.Patient;
 import org.clinigment.rest.api.model.UserAccount;
 
 /**

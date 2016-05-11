@@ -29,7 +29,7 @@ public class UserAccount implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @Id
-    @Column(name = "EMPLOYEE_ID", nullable = false, updatable = false)
+    @Column(name = "EMPLOYEE_ID", nullable = false, updatable = false, unique = true)
     private Long employeeId;
     
     @Column(name = "USERNAME", nullable = false, updatable = false)

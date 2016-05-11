@@ -19,6 +19,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.clinigment.rest.api.controller.AppointmentController;
+import org.clinigment.rest.api.controller.exceptions.NonexistentEntityException;
 import org.clinigment.rest.api.model.Appointment;
 
 /**
@@ -52,9 +53,13 @@ public class AppointmentResource {
             Date now = Calendar.getInstance().getTime();
             entity.setCreatedAt(new Timestamp(now.getTime()));
             getController().create(entity);
-            return Response.created(URI.create(entity.getId().toString())).build();
+            return Response.created(URI.create(entity.getId().toString()))
+                    .entity(entity)
+                    .build();
+        } catch (NonexistentEntityException nex) {
+            return Response.notModified(nex.getMessage()).build();
         } catch (Exception ex) {
-            return Response.notModified("Something went wrong.").build();
+            return Response.notModified(ex.getMessage()).build();
         }
     }
     

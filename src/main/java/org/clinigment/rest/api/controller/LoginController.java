@@ -44,6 +44,7 @@ public class LoginController {
         
         //Compare passwords
         if(!userAccount.getPassword().equals(password)) {
+            //I'm here
             throw new LoginException();
         }
     }

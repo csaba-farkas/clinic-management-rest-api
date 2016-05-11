@@ -4,10 +4,16 @@ package org.clinigment.rest.api.controller.filter;
 import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import org.clinigment.rest.api.controller.LoginController;
+import org.clinigment.rest.api.controller.exceptions.LoginException;
+import org.clinigment.rest.api.model.LoginForm;
 import org.clinigment.rest.api.model.UnauthorizedEntity;
 import org.glassfish.jersey.internal.util.Base64;
 
@@ -17,6 +23,18 @@ import org.glassfish.jersey.internal.util.Base64;
  */
 @Provider
 public class SecurityFilter implements ContainerRequestFilter {
+    
+    private EntityManagerFactory getEntityManagerFactory() throws NamingException {
+        return (EntityManagerFactory) new InitialContext().lookup("java:comp/env/persistence-factory");
+    }
+    
+    private LoginController getController() {
+        try {
+            return new LoginController(getEntityManagerFactory());
+        } catch (NamingException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
     
     //Static final Strings for header auth values, and login url
     private static final String AUTHORIZATION_HEADER = "Authorization";
@@ -35,7 +53,7 @@ public class SecurityFilter implements ContainerRequestFilter {
                 String authToken = authHeader.get(0);
                 //Replace "Basic " with ""
                 authToken = authToken.replaceFirst(AUTHORIZATION_HEADER_PREFIX, "");
-                //Decod username + password
+                //Decode username + password
                 String decodedString = Base64.decodeAsString(authToken);
 
                 //Tokenize username and password out of the string
@@ -43,22 +61,25 @@ public class SecurityFilter implements ContainerRequestFilter {
 
                 String username = tokenizer.nextToken();
                 String password = tokenizer.nextToken();
+                
+                LoginForm form = new LoginForm();
+                form.setUsername(username);
+                form.setPassword(password);
+                
+                try {
+                    getController().login(form);
+                } catch (LoginException ex) {
+                    UnauthorizedEntity unauthorizedEntity = new UnauthorizedEntity();
 
-                if(username.equals("admin") && password.equals("admin")) {
-                    return;
+                    //Create unauthorized response
+                    Response unauthorizedStatus = Response
+                                                    .status(Response.Status.UNAUTHORIZED)
+                                                    .entity(unauthorizedEntity)
+                                                    .build();
+                    //Break the request with "abortWith" method
+                    requestContext.abortWith(unauthorizedStatus);
                 }
             }
-
-            UnauthorizedEntity unauthorizedEntity = new UnauthorizedEntity();
-
-            //Create unauthorized response
-            Response unauthorizedStatus = Response
-                                            .status(Response.Status.UNAUTHORIZED)
-                                            .entity(unauthorizedEntity)
-                                            .build();
-            //Break the request with "abortWith" method
-            requestContext.abortWith(unauthorizedStatus);
         }
-    }
-    
+    } 
 }
