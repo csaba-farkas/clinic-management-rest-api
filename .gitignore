@@ -1,5 +1,7 @@
 target/
 nbproject/
+src/main/resources/
+src/main/webapp/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
