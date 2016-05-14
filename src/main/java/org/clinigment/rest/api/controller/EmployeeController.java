@@ -78,12 +78,28 @@ public class EmployeeController implements Serializable {
         }
     }
     
-    public void edit(Employee employee) throws NonexistentEntityException, RollbackFailureException, Exception {
+    public void edit(Employee newEmployee) throws NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
         try {
+            String errorMessage = validateEmployeeEntity(newEmployee);
+            
+            if(!errorMessage.isEmpty()) {
+                throw new Exception(errorMessage);
+            }
             userTransaction.begin();
             em = getEntityManager();
-            employee = em.merge(employee);
+            
+            //Find employee-to-update in database
+            System.out.println("Employee: " + newEmployee);
+            System.out.println("Emplyee id: " + newEmployee.getId());
+            Employee oldEmployee = em.find(Employee.class, newEmployee.getId());
+            //Call update method of patient entity class to update patient
+            if(oldEmployee == null) {
+                throw new NonexistentEntityException("The patient with id " + newEmployee.getId() + " no longer exists.");
+            }
+            System.out.println("I'm here 2");
+            oldEmployee.update(newEmployee);
+            System.out.println("I'm here 3");
             userTransaction.commit();
         } catch (Exception ex) {
             try {
@@ -93,7 +109,7 @@ public class EmployeeController implements Serializable {
             }
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Long id = employee.getId();
+                Long id = newEmployee.getId();
                 if (findEmployee(id) == null) {
                     throw new NonexistentEntityException("The employee with id " + id + " no longer exists.");
                 }
@@ -191,5 +207,9 @@ public class EmployeeController implements Serializable {
                 em.close();
             }
         }
+    }
+
+    private String validateEmployeeEntity(Employee newEmployee) {
+        return "";
     }
 }

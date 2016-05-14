@@ -66,7 +66,6 @@ public class EmployeeResource {
     public Response edit(Employee entity, @PathParam("id") Long id) {
         try {
             Date now = Calendar.getInstance().getTime();
-            entity.setUpdatedAt(new Timestamp(now.getTime()));
             getController().edit(entity);
             return Response.ok().build();
         } catch (Exception ex) {

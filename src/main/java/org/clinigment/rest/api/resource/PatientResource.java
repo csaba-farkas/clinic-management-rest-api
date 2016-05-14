@@ -58,7 +58,10 @@ public class PatientResource {
                     .entity(entity)
                     .build();
         } catch (Exception ex) {
-            return Response.notModified("Patient with PPS number entered, already exists.").build();
+            if(ex.getMessage().contains("Exception")) {
+                return Response.notModified("Patient with PPS number " + entity.getPpsNumber() + " already exists.").build();
+            }
+            return Response.notModified(ex.getMessage()).build();
         }
     }
 
@@ -70,11 +73,20 @@ public class PatientResource {
             entity.setUpdatedAt(new Timestamp(now.getTime()));
             getController().edit(entity);
             return Response.ok().entity(getController().findPatient(id)).build();
+        } catch (org.eclipse.persistence.exceptions.DatabaseException dbe) {
+            return Response.notModified("Patient with PPS number " + entity.getPpsNumber() + " already exists.").build();
         } catch (Exception ex) {
+            System.out.println("ex type: " + ex.getClass());
+            if(ex.getMessage() != null) {
+                if(ex.getMessage().contains("Exception")) {
+                    return Response.notModified("Patient with PPS number " + entity.getPpsNumber() + " already exists.").build();
+                }
+            }
             return Response.notModified(ex.getMessage()).build();
         }
     }
 
+    
     @DELETE
     @Path("{id}")
     public Response remove(@PathParam("id") Long id) {

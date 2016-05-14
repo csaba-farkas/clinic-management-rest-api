@@ -3,6 +3,7 @@ package org.clinigment.rest.api.resource;
 
 import java.net.URI;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -10,9 +11,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.UserTransaction;
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -21,6 +25,7 @@ import javax.ws.rs.core.Response;
 import org.clinigment.rest.api.controller.AppointmentController;
 import org.clinigment.rest.api.controller.exceptions.NonexistentEntityException;
 import org.clinigment.rest.api.model.Appointment;
+import org.clinigment.rest.api.resource.beans.AppointmentFilterBean;
 
 /**
  *
@@ -63,8 +68,30 @@ public class AppointmentResource {
         }
     }
     
+    @PUT
+    @Path("{id}")
+    public Response edit(Appointment entity, @PathParam("id") Long id) {
+        try {
+            Date now = Calendar.getInstance().getTime();
+            entity.setUpdatedAt(new Timestamp(now.getTime()));
+            getController().edit(entity);
+            System.out.println("Appointment sent: " + entity);
+            return Response.ok().entity(getController().findAppointment(id)).build();
+        } catch (Exception ex) {
+            return Response.notModified(ex.getMessage()).build();
+        }
+    }
+    
     @GET
-    public List<Appointment> getAll() {
+    public List<Appointment> getAllByDateAndEmployee(@BeanParam AppointmentFilterBean bean) {
+        if(bean.getYear() > 0) {
+            if(bean.getMonth() < 12 && bean.getMonth() > 0) {
+                if(bean.getDay() < 31 && bean.getDay() > 0) {
+                    LocalDate date = LocalDate.of(bean.getYear(), bean.getMonth(), bean.getDay());
+                    return getController().findAppointmentsByDateAndDoctorId(date, bean.getDoctorId());
+                }
+            }
+        }
         return getController().findAllAppointments();
     }
     
@@ -72,5 +99,16 @@ public class AppointmentResource {
     @Path("id")
     public Appointment getById(@PathParam("id") Long id) {
         return getController().findAppointment(id);
+    }
+    
+    @DELETE
+    @Path("{id}")
+    public Response remove(@PathParam("id") Long id) {
+        try {
+            getController().destroy(id);
+            return Response.ok().build();
+        } catch (Exception ex) {
+            return Response.notModified(ex.getMessage()).build();
+        }
     }
 }

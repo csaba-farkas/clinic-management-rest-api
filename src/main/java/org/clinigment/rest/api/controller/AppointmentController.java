@@ -1,10 +1,13 @@
 
 package org.clinigment.rest.api.controller;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.transaction.UserTransaction;
 import org.clinigment.rest.api.controller.exceptions.NonexistentEntityException;
@@ -44,8 +47,11 @@ public class AppointmentController {
             if(em.find(Employee.class, appointment.getDoctorId()) == null) {
                 errorMessage += "Doctor/Hygienist with id " + appointment.getDoctorId() + " doesn't exist.";
             }
-            if(em.find(Patient.class, appointment.getPatientId()) == null) {
-                errorMessage += "<br />Patient with id " + appointment.getPatientId() + " doesn't exist.";
+            
+            if(appointment.getPatientId() != null) {
+                if(em.find(Patient.class, appointment.getPatientId()) == null) {
+                    errorMessage += "<br />Patient with id " + appointment.getPatientId() + " doesn't exist.";
+                }
             }
             
             if(errorMessage.length() > 0) {
@@ -54,6 +60,68 @@ public class AppointmentController {
             
             em.persist(appointment);
             
+            userTransaction.commit();
+        } catch (Exception ex) {
+            try {
+                userTransaction.rollback();
+            } catch (Exception re) {
+                throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
+            }
+            throw ex;
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
+    }
+    
+    public void edit(Appointment newAppointment) throws NonexistentEntityException, RollbackFailureException, Exception {
+        EntityManager em = null;
+        try {
+            userTransaction.begin();
+            em = getEntityManager();
+            
+            //Find patient-to-update in database
+            System.out.println("Appointment id: " + newAppointment.getId());
+            Appointment oldAppointment = em.find(Appointment.class, newAppointment.getId());
+            if(oldAppointment == null) {
+                throw new NonexistentEntityException("Appointment with ID " + oldAppointment.getId() + " doesn't exist.");
+            }
+            //Call update method of patient entity class to update patient
+            oldAppointment.update(newAppointment);
+            
+            userTransaction.commit();
+        } catch (Exception ex) {
+            try {
+                userTransaction.rollback();
+            } catch (Exception re) {
+                throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
+            }
+            String msg = ex.getLocalizedMessage();
+            if (msg == null || msg.length() == 0) {
+                Long id = newAppointment.getId();
+                if (findAppointment(id) == null) {
+                    throw new NonexistentEntityException("The appointment with id " + id + " no longer exists.");
+                }
+            }
+            throw ex;
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+        }
+    }
+    
+    public void destroy(Long id) throws NonexistentEntityException, RollbackFailureException, Exception {
+        EntityManager em = null;
+        try {
+            userTransaction.begin();
+            em = getEntityManager();
+            Appointment appointment = em.getReference(Appointment.class, id);
+            if(appointment == null) {
+                throw new NonexistentEntityException("The appointment with id " + id + " no longer exists.");
+            }
+            em.remove(appointment);
             userTransaction.commit();
         } catch (Exception ex) {
             try {
@@ -89,5 +157,23 @@ public class AppointmentController {
         } finally {
             em.close();
         }
+    }
+
+    public List<Appointment> findAppointmentsByDateAndDoctorId(LocalDate date, Long doctorId) {
+        EntityManager em = getEntityManager();
+        try {
+            System.out.println("I'm here");
+            TypedQuery<Appointment> query = em
+                                            .createNamedQuery("Appointment.findByPatientIdOnDate", Appointment.class)
+                                            .setParameter("patientId", doctorId)
+                                            .setParameter("date", date);
+            System.out.println("query: " + query.toString());
+            return query.getResultList();
+        } catch(Exception ex) {
+            throw ex;
+        } finally {
+            em.close();
+        }
+        
     }
 }

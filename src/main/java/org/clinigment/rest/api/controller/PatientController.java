@@ -7,12 +7,17 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import javax.persistence.RollbackException;
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.Metamodel;
 import javax.transaction.UserTransaction;
 import org.clinigment.rest.api.controller.exceptions.NonexistentEntityException;
 import org.clinigment.rest.api.controller.exceptions.RollbackFailureException;
 import org.clinigment.rest.api.model.Allergy;
+import org.clinigment.rest.api.model.Appointment;
 import org.clinigment.rest.api.model.Patient;
 import org.clinigment.rest.api.model.PatientAddress;
 
@@ -43,18 +48,23 @@ public class PatientController implements Serializable {
      */
     public void create(Patient patient) throws RollbackFailureException, Exception {
         EntityManager em = null;
-        System.out.println("Log " + patient);
         try {
+            String errorMessage = validatePatientObject(patient);
+            
+            
+            if(!errorMessage.isEmpty()) {
+                throw new Exception(errorMessage);
+            }
             utx.begin();
             em = getEntityManager();
             
             //Address - detach address to avoid nullpointer exception on patient id and store it temp
             PatientAddress tempAddress = new PatientAddress();
-            System.out.println("log address: " + patient.getAddress());
-            if(patient.getAddress() != null) {
-                tempAddress = patient.getAddress();
+            System.out.println("log address: " + patient.getPatientAddress());
+            if(patient.getPatientAddress() != null) {
+                tempAddress = patient.getPatientAddress();
                 
-                patient.setAddress(null);
+                patient.setPatientAddress(null);
             }
             
             //Allergy collection - deatach to avoid nullpointer exception and store it in temp variable
@@ -71,7 +81,7 @@ public class PatientController implements Serializable {
             
             //Modify address with patient (now with id)
             tempAddress.setPatient(patient);
-            patient.setAddress(tempAddress);
+            patient.setPatientAddress(tempAddress);
             
             //Modify allergy types with patient (now with id)
             for(int i = 0; i < bufferedAllergyCollection.size(); i++) {
@@ -86,8 +96,14 @@ public class PatientController implements Serializable {
             utx.commit();
         } catch (Exception ex) {
             try {
+                if(!ex.getMessage().isEmpty()) {
+                    throw ex;
+                }
                 utx.rollback();
             } catch (Exception re) {
+                if(!re.getMessage().isEmpty()) {
+                    throw re;
+                }
                 throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
             }
             throw ex;
@@ -109,20 +125,33 @@ public class PatientController implements Serializable {
     public void edit(Patient newPatient) throws NonexistentEntityException, RollbackFailureException, Exception {
         EntityManager em = null;
         try {
+            String errorMessage = validatePatientObject(newPatient);
+            
+            if(!errorMessage.isEmpty()) {
+                throw new Exception(errorMessage);
+            }
             utx.begin();
             em = getEntityManager();
             
             //Find patient-to-update in database
             Patient oldPatient = em.find(Patient.class, newPatient.getId());
             //Call update method of patient entity class to update patient
+            if(oldPatient == null) {
+                throw new NonexistentEntityException("The patient with id " + newPatient.getId() + " no longer exists.");
+            }
             oldPatient.update(newPatient);
+            
             
             utx.commit();
         } catch (Exception ex) {
+            
             try {
+                if(!ex.getMessage().isEmpty()) {
+                    throw ex;
+                }
                 utx.rollback();
             } catch (Exception re) {
-                throw new RollbackFailureException("An error occurred attempting to roll back the transaction.", re);
+                throw new RollbackFailureException("The patient with PPS number " + newPatient.getPpsNumber() + " already exists.", re);
             }
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
@@ -182,6 +211,16 @@ public class PatientController implements Serializable {
                 q.setMaxResults(maxResults);
                 q.setFirstResult(firstResult);
             }
+            
+            List<Patient> allPatients = q.getResultList();
+            for(Patient patient : allPatients) {
+                //"SELECT i FROM " + getEntityClass().getSimpleName() + " i WHERE i.id IN :ids", entityClass
+                
+                TypedQuery<Appointment> query = em
+                                                .createNamedQuery("Appointment.findByPatientId", Appointment.class)
+                                                .setParameter("patientId", patient.getId());
+                List<Appointment> results = query.getResultList();
+            }
             return q.getResultList();
         } finally {
             em.close();
@@ -208,6 +247,87 @@ public class PatientController implements Serializable {
         } finally {
             em.close();
         }
+    }
+
+    /**
+     * Check if patient is valid and has all the required fields
+     * Required fields:
+     * 1. First name
+     * 2. Last name
+     * 3. PPS number
+     * 4. DOB
+     * 5. Gender
+     * 6. Mobile phone
+     * 7. Next of kin name
+     * 8. Next of kin contact number
+     * 9. Patient Address:
+     *      a. Address line 1
+     *      b. City/Town
+     * @param patient
+     * @return error message
+     */
+    private String validatePatientObject(Patient patient) throws Exception {
+        String errorMessage = "";
+        if(patient.getFirstName() == null || patient.getFirstName().isEmpty()) {
+                errorMessage += "First name is required";
+            }
+            if(patient.getLastName() == null || patient.getLastName().isEmpty()) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "Last name is required";
+            }
+            if(patient.getPpsNumber() == null || patient.getPpsNumber().isEmpty()) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "PPS number is required";
+            }
+            if(patient.getDateOfBirth() == null) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "Date of birth is required";
+            }
+            if(patient.getGender() == null) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "Gender is required";
+            }
+            if(patient.getMobilePhone() == null || patient.getMobilePhone().isEmpty()) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "Mobile phone number is required";
+            }
+            if(patient.getNextOfKinName() == null || patient.getNextOfKinName().isEmpty()) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "Next of kin name is required";
+            }
+            if(patient.getPatientAddress() == null) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "Patient address is required";
+            }
+            if(patient.getPatientAddress().getAddressLine1() == null || patient.getPatientAddress().getAddressLine1().isEmpty()) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "Address line 1 is required";
+            }
+            if(patient.getPatientAddress().getCityTown() == null || patient.getPatientAddress().getCityTown().isEmpty()) {
+                if(!errorMessage.isEmpty()) {
+                    errorMessage += "+";
+                }
+                errorMessage += "City/Town is required";
+            }
+        
+            
+            return errorMessage;
     }
     
 }

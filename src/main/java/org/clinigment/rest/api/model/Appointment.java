@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -32,6 +34,12 @@ import org.clinigment.rest.api.model.converters.LocalDateTimeAttributeConverter;
 @Entity
 @Table(name = "appointment")
 @XmlRootElement
+@NamedQueries({
+    @NamedQuery(name = "Appointment.findByPatientId",
+        query = "SELECT a FROM Appointment a WHERE a.patientId = :patientId"),
+    @NamedQuery(name = "Appointment.findByPatientIdOnDate",
+        query = "SELECT a FROM Appointment a WHERE a.doctorId = :patientId AND a.date = :date")
+})
 public class Appointment implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -57,7 +65,7 @@ public class Appointment implements Serializable {
     @Convert(converter = LocalDateTimeAttributeConverter.class)
     private LocalDateTime endTime;
     
-    @Column(name = "appPATIENT_ID", updatable = false, insertable = false)
+    @Column(name = "appPATIENT_ID", updatable = false, insertable = true)
     private Long patientId;
         
     @Column(name = "PATIENT_NAME")
@@ -225,4 +233,17 @@ public class Appointment implements Serializable {
     public String toString() {
         return "Appointment{" + "id=" + id + ", date=" + date + ", startTime=" + startTime + ", endTime=" + endTime + ", patientId=" + patientId + ", patientName=" + patientName + ", contactNumber=" + contactNumber + ", description=" + description + ", doctorId=" + doctorId + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }   
+
+    public void update(Appointment newAppointment) {
+        this.contactNumber = newAppointment.getContactNumber();
+        this.createdAt = newAppointment.getCreatedAt();
+        this.date = newAppointment.getDate();
+        this.description = newAppointment.getDescription();
+        this.doctorId = newAppointment.getDoctorId();
+        this.endTime = newAppointment.getEndTime();
+        this.patientId = newAppointment.getPatientId();
+        this.patientName = newAppointment.getPatientName();
+        this.startTime = newAppointment.getStartTime();
+        this.updatedAt = newAppointment.getUpdatedAt();
+    }
 }

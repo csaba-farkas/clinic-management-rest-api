@@ -141,7 +141,7 @@ public class PatientAddress implements Serializable {
         return "PatientAddress{" + "patientId=" + patientId + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2 + ", addressLine3=" + addressLine3 + ", cityTown=" + cityTown + ", county=" + county + ", country=" + country + '}';
     }
 
-    void update(PatientAddress patientAddress) {
+    public void update(PatientAddress patientAddress) {
         this.addressLine1 = patientAddress.getAddressLine1();
         this.addressLine2 = patientAddress.getAddressLine2();
         this.addressLine3 = patientAddress.getAddressLine3();

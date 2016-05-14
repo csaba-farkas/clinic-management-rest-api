@@ -22,6 +22,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.clinigment.rest.api.model.adapters.LocalDateAdapter;
 import org.clinigment.rest.api.model.converters.LocalDateAttributeConverter;
@@ -54,7 +55,7 @@ public class Patient implements Serializable {
    
     @Column(name = "LAST_NAME", length = 100, nullable = false)
     private String lastName;
-   
+    
     @Column(name = "PPS_NUMBER", length = 100, nullable = false, unique = true)
     private String ppsNumber;
    
@@ -252,14 +253,6 @@ public class Patient implements Serializable {
         this.homePhone = homePhone;
     }
 
-    public PatientAddress getAddress() {
-        return patientAddress;
-    }
-
-    public void setAddress(PatientAddress address) {
-        this.patientAddress = address;
-    }
-
     public String getNextOfKinName() {
         return nextOfKinName;
     }
@@ -323,8 +316,18 @@ public class Patient implements Serializable {
     public void setPatientAddress(PatientAddress patientAddress) {
         this.patientAddress = patientAddress;
     }
+    
+    @XmlTransient
+    public String getFullName() {
+        if(this.middleName.isEmpty()) {
+            return firstName + " " + lastName;
+        }
+        return firstName + " " + middleName + " " + lastName;
+    }
 
     public void update(Patient patient) {
+        System.out.println("Update msg 1");
+
         this.title = patient.getTitle();
         this.firstName = patient.getFirstName();
         this.middleName = patient.getMiddleName();
@@ -337,6 +340,7 @@ public class Patient implements Serializable {
         this.homePhone = patient.getHomePhone();
         this.nextOfKinName = patient.getNextOfKinName();
         this.nextOfKinContact = patient.getNextOfKinContact();
+        
         
         //Allergy collection
         if(patient.getAllergyCollection() == null || patient.getAllergyCollection().isEmpty()) {

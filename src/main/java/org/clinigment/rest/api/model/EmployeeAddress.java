@@ -135,5 +135,14 @@ public class EmployeeAddress implements Serializable {
         return "EmployeeAddress{" + "empId=" + empId + ", employee=" + employee + ", addressLine1=" + addressLine1 + ", addressLine2=" + addressLine2 + ", addressLine3=" + addressLine3 + ", cityTown=" + cityTown + ", county=" + county + ", country=" + country + '}';
     }
 
+    void update(EmployeeAddress employeeAddress) {
+        this.addressLine1 = employeeAddress.getAddressLine1();
+        this.addressLine2 = employeeAddress.getAddressLine2();
+        this.addressLine3 = employeeAddress.getAddressLine3();
+        this.cityTown = employeeAddress.getCityTown();
+        this.county = employeeAddress.getCounty();
+        this.country = employeeAddress.getCountry();
+    }
+
     
 }

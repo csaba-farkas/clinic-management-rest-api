@@ -3,7 +3,9 @@ package org.clinigment.rest.api.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -44,6 +46,7 @@ public class Employee implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "EMPLOYEE_ID", updatable = false, nullable = false)
+    @XmlID
     private Long id;
     
     @Column(name = "TITLE", length = 5)
@@ -79,7 +82,7 @@ public class Employee implements Serializable {
     @Column(name = "ROLE", nullable = false)
     @Enumerated(EnumType.STRING)
     private EmpRole role;
-    
+      
     @Column(name = "MOBILE_PHONE", length = 100, nullable = false)
     private String mobilePhone;
     
@@ -322,6 +325,29 @@ public class Employee implements Serializable {
     @Override
     public String toString() {
         return "Employee{" + "id=" + id + ", title=" + title + ", firstName=" + firstName + ", lastName=" + lastName + ", middleName=" + middleName + ", dateOfBirth=" + dateOfBirth + ", ppsNumber=" + ppsNumber + ", employedSince=" + employedSince + ", employedUntil=" + employedUntil + ", role=" + role + ", mobilePhone=" + mobilePhone + ", homePhone=" + homePhone + ", email=" + email + ", employeeAddress=" + employeeAddress + ", userAccount=" + userAccount + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
+    }
+
+     
+    /**
+     * 
+     * @param newEmployee
+     */
+    
+    public void update(Employee newEmployee) {
+       this.title = newEmployee.getTitle();
+       this.firstName = newEmployee.getFirstName();
+       this.lastName = newEmployee.getLastName();
+       this.middleName = newEmployee.getMiddleName();
+       this.dateOfBirth = newEmployee.getDateOfBirth();
+       this.ppsNumber = newEmployee.getPpsNumber();
+       this.employedSince = newEmployee.getEmployedSince();
+       this.employedUntil = newEmployee.getEmployedUntil();
+       this.role = newEmployee.getRole();
+       this.mobilePhone = newEmployee.getMobilePhone();
+       this.homePhone = newEmployee.getHomePhone();
+       this.email = newEmployee.getEmail();
+       this.employeeAddress.update(newEmployee.getEmployeeAddress());
+       this.updatedAt = Timestamp.valueOf(LocalDateTime.now());
     }
 
     
