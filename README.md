@@ -31,6 +31,6 @@
 </li>
 <li>
   <p>Type the URL of your server into the browser again (same as step 1). If the installation was successful, you see the following screen</p>
-  <img src="http://176.32.230.250/lastminute84.com/images/step7.png alt="Step 7" />
+  <img src="http://176.32.230.250/lastminute84.com/images/step7.png" alt="Step 7" />
 </li>
 </ol>
