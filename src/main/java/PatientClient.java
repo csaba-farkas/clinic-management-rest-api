@@ -56,18 +56,6 @@ public class PatientClient {
         
         Response allPatientsResponse = allPatientsTarget.request(MediaType.APPLICATION_JSON).get();
         
-        //It's all the same here
-        //It seems to be something on my end that's 
-        //Now, as you see, I created this class in the server application, just to test
-        //it. So I had the power of Maven, to download any extra dependency.
-        //Do you think, you could create a new Maven project (there is an pre-defined Maven FX
-        //project)? Then copy all the packages over, and rebuild it with Maven?
-        //Yea I think I'd be able to do that, then I would be able to copy your dependancy setup somewhat
-        //Cool. If you just look for the pom.xml file, everything should be in there. I jus show
-        //you something.
-        //That's how you create a new JavaFX project with Maven.
-        //So the pom.xml file is a bit different, because it contains all the JavaFX staff.
-        //But watch this.
         switch (allPatientsResponse.getStatus()) {
             case 200:
                 List<Patient> patients = allPatientsResponse.readEntity(new GenericType<List<Patient>>(){});

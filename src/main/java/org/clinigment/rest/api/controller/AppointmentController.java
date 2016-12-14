@@ -36,9 +36,6 @@ public class AppointmentController {
     
     public void create(Appointment appointment) throws RollbackFailureException, Exception {
         EntityManager em = null;
-        System.out.println("Log " + appointment);
-        
-        
         try {
             userTransaction.begin();
             em = getEntityManager();
@@ -50,7 +47,7 @@ public class AppointmentController {
             
             if(appointment.getPatientId() != null) {
                 if(em.find(Patient.class, appointment.getPatientId()) == null) {
-                    errorMessage += "<br />Patient with id " + appointment.getPatientId() + " doesn't exist.";
+                    errorMessage += " Patient with id " + appointment.getPatientId() + " doesn't exist.";
                 }
             }
             
@@ -162,12 +159,10 @@ public class AppointmentController {
     public List<Appointment> findAppointmentsByDateAndDoctorId(LocalDate date, Long doctorId) {
         EntityManager em = getEntityManager();
         try {
-            System.out.println("I'm here");
             TypedQuery<Appointment> query = em
                                             .createNamedQuery("Appointment.findByPatientIdOnDate", Appointment.class)
                                             .setParameter("patientId", doctorId)
                                             .setParameter("date", date);
-            System.out.println("query: " + query.toString());
             return query.getResultList();
         } catch(Exception ex) {
             throw ex;

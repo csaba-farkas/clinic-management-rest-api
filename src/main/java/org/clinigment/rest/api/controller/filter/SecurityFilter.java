@@ -3,6 +3,7 @@ package org.clinigment.rest.api.controller.filter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -13,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import org.clinigment.rest.api.controller.LoginController;
 import org.clinigment.rest.api.controller.exceptions.LoginException;
+import org.clinigment.rest.api.model.Employee;
 import org.clinigment.rest.api.model.LoginForm;
 import org.clinigment.rest.api.model.UnauthorizedEntity;
 import org.glassfish.jersey.internal.util.Base64;
@@ -50,9 +52,6 @@ public class SecurityFilter implements ContainerRequestFilter {
             List<String> authHeader = requestContext.getHeaders().get(AUTHORIZATION_HEADER);
 
             if(authHeader != null && authHeader.size() > 0) {
-                if(true) {
-                    return;
-                }
                 
                 String authToken = authHeader.get(0);
                 //Replace "Basic " with ""
@@ -64,26 +63,53 @@ public class SecurityFilter implements ContainerRequestFilter {
                 StringTokenizer tokenizer = new StringTokenizer(decodedString, ":");
 
                 String username = tokenizer.nextToken();
-                String password = tokenizer.nextToken();
+                String password = "";
+                try {
+                    System.out.println("I'm here");
+                    password = tokenizer.nextToken();
+                } catch (NoSuchElementException nee) {
+                    UnauthorizedEntity unauthorizedEntity = new UnauthorizedEntity();
+
+                    //Create unauthorized response
+                    Response unauthorizedStatus = Response
+                                                    .status(Response.Status.UNAUTHORIZED)
+                                                    .build();
+                    //Break the request with "abortWith" method
+                    requestContext.abortWith(unauthorizedStatus);
+                }
                 
                 LoginForm form = new LoginForm();
                 form.setUsername(username);
                 form.setPassword(password);
                 
                 try {
-                    getController().login(form);
+                    Employee emp = getController().login(form);
+                    System.out.println("Employee " + emp);
+                    if(emp == null) {
+                        throw new LoginException();
+                    }
                 } catch (LoginException ex) {
                     UnauthorizedEntity unauthorizedEntity = new UnauthorizedEntity();
 
                     //Create unauthorized response
                     Response unauthorizedStatus = Response
                                                     .status(Response.Status.UNAUTHORIZED)
-                                                    .entity(unauthorizedEntity)
                                                     .build();
                     //Break the request with "abortWith" method
                     requestContext.abortWith(unauthorizedStatus);
                 }
+            } else {
+                UnauthorizedEntity unauthorizedEntity = new UnauthorizedEntity();
+
+                    //Create unauthorized response
+                    Response unauthorizedStatus = Response
+                                                    .status(Response.Status.UNAUTHORIZED)
+                                                    .build();
+                    //Break the request with "abortWith" method
+                    requestContext.abortWith(unauthorizedStatus);
             }
         }
+        
+        
     } 
 }

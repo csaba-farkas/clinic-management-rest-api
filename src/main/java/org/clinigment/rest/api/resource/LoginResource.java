@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.clinigment.rest.api.controller.LoginController;
 import org.clinigment.rest.api.controller.exceptions.LoginException;
+import org.clinigment.rest.api.model.Employee;
 import org.clinigment.rest.api.model.LoginForm;
 import org.clinigment.rest.api.model.UnauthorizedEntity;
 
@@ -51,12 +52,15 @@ public class LoginResource {
     @POST
     public Response login(LoginForm loginForm) {
         try {
-            getController().login(loginForm);
+            Employee employee = getController().login(loginForm);
+            
+            return Response.ok()
+                    .entity(employee)
+                    .build();
         } catch (LoginException ex) {
             return Response.status(Status.UNAUTHORIZED)
-                    .entity(new UnauthorizedEntity(ex.getMessage()))
                     .build();
         }
-        return Response.ok().build();
+        
     }
 }

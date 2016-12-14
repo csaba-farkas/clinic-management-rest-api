@@ -75,7 +75,6 @@ public class AppointmentResource {
             Date now = Calendar.getInstance().getTime();
             entity.setUpdatedAt(new Timestamp(now.getTime()));
             getController().edit(entity);
-            System.out.println("Appointment sent: " + entity);
             return Response.ok().entity(getController().findAppointment(id)).build();
         } catch (Exception ex) {
             return Response.notModified(ex.getMessage()).build();

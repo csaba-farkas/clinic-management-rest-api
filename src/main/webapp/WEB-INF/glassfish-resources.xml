@@ -29,14 +29,15 @@
         <property name="portNumber" value="3306"/>
         <property name="databaseName" value="clinigmentdbv2"/>
         
-        
+        <!-- Cloud server MySQL credentials
         <property name="User" value="testuser"/>
         <property name="Password" value="clinigment_admin"/>
-        
-        <!--
-        <property name="User" value="root" />
-        <property name="Password" value="Tusika84" />
         -->
+        
+        
+        <property name="User" value="YOUR USERNAME" />
+        <property name="Password" value="YOUR PASSWORD" />
+        
         
         <property name="URL" value="jdbc:mysql://localhost:3306/clinigmentdbv2?zeroDateTimeBehavior=convertToNull"/>
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>

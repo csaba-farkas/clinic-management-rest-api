@@ -95,6 +95,7 @@ public class Employee implements Serializable {
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     private EmployeeAddress employeeAddress;
     
+    @XmlTransient
     @OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
     private UserAccount userAccount;
     

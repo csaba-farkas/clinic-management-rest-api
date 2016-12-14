@@ -33,6 +33,7 @@ import org.eclipse.persistence.annotations.PrivateOwned;
  *
  * @author csaba
  */
+
 @Entity
 @Table(name="patient")
 @XmlRootElement

@@ -28,6 +28,7 @@ import org.clinigment.rest.api.model.UserAccount;
  *
  * @author csaba
  */
+
 @Path("employees")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -55,7 +56,9 @@ public class EmployeeResource {
             Date now = Calendar.getInstance().getTime();
             employee.setCreatedAt(new Timestamp(now.getTime()));
             getController().create(employee);
-            return Response.created(URI.create(employee.getId().toString())).build();
+            return Response.created(URI.create(employee.getId().toString()))
+                    .entity(employee)
+                    .build();
         } catch (Exception ex) {
             return Response.notModified("Employee with PPS number entered, already exists.").build();
         }
@@ -111,7 +114,9 @@ public class EmployeeResource {
             Date now = Calendar.getInstance().getTime();
             userAccount.setCreatedAt(new Timestamp(now.getTime()));
             getController().createUserAccount(employeeId, userAccount);
-            return Response.created(null).build();
+            return Response.created(null)
+                    .entity(userAccount)
+                    .build();
         } catch(Exception ex) {
             return Response.notModified("Employee already has a user account.").build();
         }

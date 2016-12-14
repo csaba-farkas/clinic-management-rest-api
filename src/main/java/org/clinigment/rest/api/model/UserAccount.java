@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -24,6 +25,8 @@ import org.clinigment.rest.api.model.enums.AccountType;
 @Entity
 @Table(name = "system_user")
 @XmlRootElement
+@NamedQuery(name = "UserAccount.findByUsernameAndPassword",
+        query = "SELECT u FROM UserAccount u WHERE u.username = :username AND u.password = :password")
 public class UserAccount implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -50,6 +53,7 @@ public class UserAccount implements Serializable {
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
     
+    @XmlTransient
     @OneToOne(targetEntity = Employee.class, optional = false, orphanRemoval = true)
     @PrimaryKeyJoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
     private Employee employee;
@@ -160,7 +164,7 @@ public class UserAccount implements Serializable {
 
     @Override
     public String toString() {
-        return "UserAccount{" + "employeeId=" + employeeId + ", username=" + username + ", password=" + password + ", accountType=" + accountType + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", employee=" + employee + '}';
+        return "UserAccount{" + "employeeId=" + employeeId + ", username=" + username + ", password=" + password + ", accountType=" + accountType + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
     
     

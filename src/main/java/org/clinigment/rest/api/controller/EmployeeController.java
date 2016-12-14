@@ -42,7 +42,6 @@ public class EmployeeController implements Serializable {
             
             //Address - detach address to avoid nullpointer exception on patient id and store it temp
             EmployeeAddress tempAddress = null;
-            System.out.println("log address: " + employee.getEmployeeAddress());
             if(employee.getEmployeeAddress() != null) {
                 tempAddress = employee.getEmployeeAddress();
                 

@@ -4,7 +4,10 @@ package org.clinigment.rest.api.controller;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 import org.clinigment.rest.api.controller.exceptions.LoginException;
+import org.clinigment.rest.api.model.Appointment;
+import org.clinigment.rest.api.model.Employee;
 import org.clinigment.rest.api.model.LoginForm;
 import org.clinigment.rest.api.model.UserAccount;
 
@@ -25,15 +28,18 @@ public class LoginController {
     }
     
     
-    public void login(LoginForm loginForm) throws LoginException {
+    public Employee login(LoginForm loginForm) throws LoginException {
         
         String username = loginForm.getUsername();
         String password = loginForm.getPassword();
+        
+        TypedQuery<UserAccount> query = emFactory
+                                       .createEntityManager()
+                                       .createNamedQuery("UserAccount.findByUsernameAndPassword", UserAccount.class)
+                                       .setParameter("username", loginForm.getUsername())
+                                       .setParameter("password", loginForm.getPassword());
 
-        List<UserAccount> resultList = emFactory
-                .createEntityManager()
-                .createNativeQuery("SELECT * FROM system_user WHERE USERNAME = '" + username + "';", UserAccount.class)
-                .getResultList();
+        List<UserAccount> resultList = query.getResultList();
         
         if(resultList.isEmpty()) {
             throw new LoginException();
@@ -42,10 +48,16 @@ public class LoginController {
         //List can contain maximum of 1 element
         UserAccount userAccount = resultList.get(0);
         
-        //Compare passwords
-        if(!userAccount.getPassword().equals(password)) {
-            //I'm here
+        Long empId = userAccount.getEmployeeId();
+        
+        Employee employee = emFactory
+                            .createEntityManager()
+                            .find(Employee.class, empId);
+        
+        if(employee == null) {
             throw new LoginException();
         }
+        
+        return employee;
     }
 }
